@@ -26,4 +26,23 @@ minhaPlanilha <- read.table("bancodedados.csv", h = T)
 
 write.csv(minhaPlanilha, "dados.txt")
 
+# Criando objetos em R
+
+# Lista de nomes: funcao c() = concatenar variaveis
+nomes <- c("Fulano", "Beltrano", "Ciclano")
+idade <- c(28, 25, 48)
+
+teste <- c("fulano", 1000, "500", 500, "500.0", 
+           500.00, c(200, 9, c(200.00, 54.04354536347457)))
+
+outroteste <- c("fulano", 100)
+
+
+
+
+
+
+
+
+
 
