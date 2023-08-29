@@ -68,7 +68,7 @@ datas <- c(10, 20, 30)
 pessoas <- c("Fulano", "Beltrano", "Ciclano")
 
 ########## MATRIZ ###########
-# Armazena os dados em dois planos: linhas e colunas
+# Armazena os dados em dois planos (duas dimensoes): linhas e colunas
 # [1, 2] => Linha 1, Coluna 2
 # Mantem os dados com apenas uma classe, assim como nos vetores
 args(matrix)
@@ -88,3 +88,23 @@ diasEPessoas
 #Se eu coloco um numero de linhas ou colunas acima, ele repetira os dados
 diasEPessoasRepetidas <- matrix(c(datas, pessoas), nrow = 16, ncol = 6, byrow = TRUE)
 diasEPessoasRepetidas
+
+############ DATA FRAMES ################
+# Consigo armazenar informacoes em duas dimensoes, porem eu delimito as informacoes que devem estar 
+#contidas em cada coluna
+# Os dados podem assumir naturezas diferentes (numerico, string etc)
+pessoasEAniversarios <- data.frame(pessoas, datas)
+pessoasEAniversarios
+
+# Encontrando as classes de cada vetor do data frame
+str(pessoasEAniversarios)
+
+################ LISTAS ##################
+# Podemos juntar objetos ou outras estruturas de dados onde nao necessariamente
+#precisam fazer sentido logico
+# Podem assumir qualquer natureza e armazena sequencialmente
+
+list()
+
+lista <- list(diasEPessoas, diasEPessoasRepetidas, datas, datasDeAniversario)
+lista
