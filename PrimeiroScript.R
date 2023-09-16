@@ -13,7 +13,6 @@ citation()
 # Demonstracoes de graficos e diversas outras funcionalidades do R
 demo()
 
-file
 
 # Documentacao da funcao Importar Ler Tabela
 
