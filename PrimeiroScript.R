@@ -41,6 +41,7 @@ teste <- c("fulano", 1000, "500", 500, "500.0",
 
 outroteste <- c("fulano", 100)
 
+plot(outroteste)
 
 
 
