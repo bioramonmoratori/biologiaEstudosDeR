@@ -83,3 +83,7 @@ shapiro.test(dadosPareados$logDaDiferenca) # > 0.05
 
 # Fazendo isso, eu normalizo os dados mas perco a nocao da escala de horas 
 # que uma pessoa dormiu ou nao
+
+# Teste T Pareado
+testeT  <- t.test(dadosPareados$naoTomouCafe, dadosPareados$tomouCafe, paired = TRUE)
+testeT # 0.002 - Teste aceito
