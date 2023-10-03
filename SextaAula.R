@@ -3,10 +3,11 @@
 ######### TESTE T de Student
 
 # Usado para analisar dois grupos
-
+sleep
 # Uma variavel categorica com uma quantitativa
 
 # Dados Sleep compoe o efeito de cafe nas horas de sono dos pacientes
+
 dadosDeEfeitoDeCafeNoSono <- sleep
 dadosDeEfeitoDeCafeNoSono
 
@@ -14,8 +15,12 @@ dadosDeEfeitoDeCafeNoSono
 colnames(dadosDeEfeitoDeCafeNoSono)[1]  <- "Horas_de_Sono"
 colnames(dadosDeEfeitoDeCafeNoSono)[2]  <- "Grupo"
 
+# se der problema com "horas de sono":
+# faca o detach e o attach
+# Preciso fazer ele desrreconhecer o nome antigo e fazer conhecer o nome novo
 detach(dadosDeEfeitoDeCafeNoSono)
 attach(dadosDeEfeitoDeCafeNoSono)
+
 summary(dadosDeEfeitoDeCafeNoSono)
 str(dadosDeEfeitoDeCafeNoSono)
 
@@ -75,8 +80,11 @@ shapiro.test(Horas_de_Sono[Grupo=="2"])
 # As caixas dos bloxpot nao podem estar com tamanhos diferentes
 # Os dados devem estar variando em mesma proporcao
 # Teste de Levene (p deve ser maior que 0.05 para cumprir o pressuposto)
-library(car)
-leveneTest(Horas_de_Sono~Grupo) # p = 0.6244
+library(car) #Carrega a biblioteca 
+boxplot(Horas_de_Sono, Grupo, col="pink")
+leveneTest(Horas_de_Sono~Grupo) # p = 0.6244 
+# Os dados sao homogeneos e nao apresentam variacao significativa para dizer
+# o contrario
 
 # Os dados do Café devem cumprir os dois pressupostos para a realização do Teste T
 # Os dados cumprem os pressupostos
@@ -87,6 +95,7 @@ leveneTest(Horas_de_Sono~Grupo) # p = 0.6244
 
 # Ele pega o valor de t e analisa o valor de p correspondente
 t.test(Horas_de_Sono~Grupo, var.equal=TRUE) # t = -1.86 e p = 0.079
+
 
 ######### INTERPRETACAO DA RESPOSTA
 # Temos duas hipoteses diferentes
@@ -100,8 +109,15 @@ t.test(Horas_de_Sono~Grupo, var.equal=TRUE) # t = -1.86 e p = 0.079
 # quem dormiu mais horas e quem dormiu menos horas
 
 # Para a pergunta de quem tomou cafe dormiu menos, usamos o Teste T a seguir:
-t.test(Horas_de_Sono, var.equal=TRUE, alternative = "less") # Quem tomou cafe dormiu menos?
-t.test(Horas_de_Sono, var.equal=TRUE, alternative = "greater")
+# var.equal significa que atendemos o pressuposto da homogeneidade de variancias
+
+# O grupo de quem tomou cafe dormiu mais que o grupo dois (que nao tomou)?
+t.test(Horas_de_Sono, var.equal=TRUE, alternative = "less") # p = 0.9985
+
+# O grupo de quem tomou cafe dormiu menos que o grupo dois?
+t.test(Horas_de_Sono, var.equal=TRUE, alternative = "greater") # p = 0.0014
+
+
 
 # Agora o valor deu < 0.05 para dormir menos e > 0.05 para dormir mais
 # Significa que as hipoteses ja tem direcao
