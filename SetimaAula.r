@@ -85,5 +85,10 @@ shapiro.test(dadosPareados$logDaDiferenca) # > 0.05
 # que uma pessoa dormiu ou nao
 
 # Teste T Pareado
+# O resultado do teste significa a diferenca entre tomar cafe e nao tomar cafe 
+# na hora de dormir
+
+# O parametro paired precisa ser colocado pois os dados nao representam distribuicao normal
+# 
 testeT  <- t.test(dadosPareados$naoTomouCafe, dadosPareados$tomouCafe, paired = TRUE)
 testeT # 0.002 - Teste aceito
