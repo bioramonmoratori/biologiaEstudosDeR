@@ -4,9 +4,18 @@
 
 # installed.packages()
 
+# Para esse estudo, o objetivo era comparar se a polinizacao impacta positivamente 
+# no aumento da producao de frutos em plantas
+# Foram considerados ramos cobertos e descobertos de uma mesma planta, pois plantas
+# diferentes estao posicionadas em ambientes diferentes com recursos diferentes
+# O pareamento das informacoes e importante para trazer confiabilidade no delineamento
+# experimental
+
 # Leitura de dados (ajuste o sep conforme necessário)
 dadosPratica1Bruto <- read.csv("pratica1.txt", header = TRUE, sep = "")
 attach(dadosPratica1Bruto)
+
+dadosPratica1Bruto
 
 # Verificando o pressuposto da normalidade
 hist(Riqueza)
@@ -89,6 +98,8 @@ qqnorm(diferenças)
 qqline(diferenças, lty=2)
 
 shapiro.test(diferenças)
+# Parametro Greater => com direcao maior
+# Parametro Less => com direcao menor
 t.test(Ramo_desoberto, Ramo_coberto, paired=T, alternative="greater")
 
 # Os dados estao relacionados (como passado e presente)
@@ -111,9 +122,6 @@ dados_long
 
 # Gráfico dos pontos pareados no test
 ggplot(dados_long, aes(x = Tratamento , y = Frutos, color = "Frutos", group = Planta)) +
-geom_point(size = 3) +
-geom_line(size = 1) +
-scale_color_brewer(palette = "Set1") +
-labs(x = "Tipo de Ramo", y = "Frutos", title = "Frutos por Tipo de Ramo", color =
-"Legenda") +
-theme_minimal()
+    eom_point(size = 3) + geom_line(size = 1) + scale_color_brewer(palette = "Set1") +
+    labs(x = "Tipo de Ramo", y = "Frutos", title = "Frutos por Tipo de Ramo", 
+    color = "Legenda") + theme_minimal()
