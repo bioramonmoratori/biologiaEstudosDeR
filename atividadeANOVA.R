@@ -1,5 +1,8 @@
 # ATIVIDADE ANOVA
 
+# Aqui eu errei, coloquei varios testes ANOVA com apenas um tratamento resposta
+# A ANOVA e feita para varios tratamentos resposta ao mesmo tempo
+
 dadosANOVA  <- read.table("dados_anova.csv", header=T, sep=",")
 dadosANOVA
 

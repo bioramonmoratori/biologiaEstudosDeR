@@ -1,0 +1,122 @@
+lineplot.CI              package:sciplot               R Documentation
+
+_L_i_n_e _P_l_o_t _w_i_t_h _C_I
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     Lineplot of the mean and standard error (or other summary
+     statistics) of a response variable for one-way or higher
+     experimental designs.
+
+_U_s_a_g_e:
+
+     lineplot.CI(x.factor, response, group=NULL, type="b", xlab=NULL, ylab=NULL,
+         x.cont=FALSE, legend=TRUE, leg.lab=NULL, fixed=FALSE,
+         x.leg=NULL, y.leg=NULL, cex.leg=1, ncol=1,
+         pch=c(16, 21, 15, 22, 17, 24, c(3:14)), 
+         fun = function(x) mean(x, na.rm=TRUE),
+         ci.fun= function(x) c(fun(x)-se(x), fun(x)+se(x)),
+         err.width = if(length(levels(as.factor(x.factor))) > 10) 0 else 0.1,
+         err.col = col, err.lty = 1, 
+         xlim=NULL, ylim=NULL, cex=NULL, lwd=NULL, col="black", cex.axis=1,
+         xaxt="s", data=NULL, subset=NULL, ...)
+     
+_A_r_g_u_m_e_n_t_s:
+
+x.factor: a factor (required) whose levels will form the x axis.
+
+response: a numeric variable giving the response.
+
+   group: grouping factor (optional) whose levels will form the traces.
+
+    type: the type of plot: lines, points, or both. Defaults to both.
+
+    xlab: default x-axis label. If not specified will parse name from
+          x.factor. To leave blank set to NA
+
+    ylab: default y-axis label. If not specified will parse name from
+          response. To leave blank set to NA
+
+  x.cont: logical.  Treat x.factor as a continuous variable?
+
+  legend: logical.  Should a legend be included?
+
+ leg.lab: legend labels for trace factors.
+
+   fixed: logical.  Should the legend be in the order of the levels of
+          'trace.factor' or in the order of the traces at their
+          right-hand ends?
+
+x.leg, y.leg: optional values to over ride the default legend
+          placement.
+
+ cex.leg: character expansion value for legend labels.
+
+    ncol: number of columns to use for legend.
+
+     pch: a vector of plotting symbols or characters.
+
+     fun: the function to compute the summary statistic.  Should return
+          a single real value.  Defaults to mean with NA values
+          removed.
+
+  ci.fun: the functions to compute the CI.  Should return a vector of
+          length 2 defining the lower and upper limits of the CI's.
+          Defaults to the mean +/- 1 standard error, with NA values
+          removed.
+
+err.width: set width of whiskers for error bars.
+
+ err.col: color for error bars. Defaults to col.
+
+ err.lty: line type for error bars.
+
+xlim, ylim: range for x and y axes.
+
+     cex: overall plot character expansion value.
+
+     lwd: deterimines line width.
+
+     col: default color(s) for plot.
+
+cex.axis: character expansion value for axis labels.
+
+    xaxt: should x-axis be drawn?
+
+    data: an optional data frame.
+
+  subset: an optional expression indicating the subset of the rows of
+          'data' that should be used in the plot.
+
+     ...: further graphical parameters.
+
+_D_e_t_a_i_l_s:
+
+     Plots a response as a function of treatment (factor) combinations
+     for one-way and higher designs.  This is a "wrapper" function for
+     plot in one-way designs and interaction.plot in higher-way designs
+     that adds confidence intervals - those functions should be
+     consulted for details. Notable changes from the defaults for
+     interaction.plot include the removal of NA values by default,
+     options to specify a subset of data and greater flexibility in the
+     placement of legends.  This function replicates some of the
+     functionality of plotmeans from the package gplots, with
+     differences in the treatment of two-way and higher designs.
+
+_S_e_e _A_l_s_o:
+
+     ‘interaction.plot’, ‘se’
+
+_E_x_a_m_p_l_e_s:
+
+     data(ToothGrowth)
+     
+     # One way design
+     lineplot.CI(x.factor = dose, response = len, data = ToothGrowth) 
+     
+     # Two-way design with options
+     lineplot.CI(dose, len, group = supp, data = ToothGrowth, cex = 2,
+                 xlab = "Dose", ylab = "Growth", cex.lab = 1.5, x.leg = 1,
+                 col = c("blue","red"), pch = c(16,16))
+     
+
