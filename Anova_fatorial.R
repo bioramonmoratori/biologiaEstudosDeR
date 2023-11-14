@@ -5,7 +5,6 @@
 # Simone            #
 #####################
 
-dir()
 read.table("dados_anova.txt", header=T)
 dados<-read.table("dados_anova.txt", header=T)
 
@@ -105,8 +104,6 @@ ggplot(sum, aes(x = sex, y = wl2, colour = group))+
 
 library(sciplot)
 
-?lineplot.CI()
-
 lineplot.CI(group, wl2, group = sex, data = dados, 
             cex = 2,
             xlab = "Tratamento", 
@@ -123,5 +120,3 @@ lineplot.CI(sex, wl2, group = group, data = dados,
             y.leg = 12,
             col = c("blue","red", "green"), 
             pch = c(16,16,16), ylim = c(0, 12))
-
-
