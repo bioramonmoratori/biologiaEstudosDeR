@@ -88,4 +88,8 @@ ggplot(dados, aes(x = Predador, y = Densidade, fill = Predador)) +
   scale_fill_brewer(palette = 3) +
   stat_summary(fun.y= "mean",color= "black", shape=16)
 
+## TESTE ###
+# Subindo esse codigo via exclusivamente terminal / vim
+
+
 
