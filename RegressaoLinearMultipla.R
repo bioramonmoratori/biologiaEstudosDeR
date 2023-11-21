@@ -76,6 +76,9 @@ plot(modeloSoIdade$fitted, modeloSoIdade$residuals, pch=16) #PASSOU
 
 # Rodar modelo com as duas variaveis juntas porem sem interacao
 
+# o '+' da funcao significa que estamos avaliando sem interacao
+# se eu quiser com interacao, coloco o simbolo '*'
+# modeloJunto <- lm(LungCap ~ Smoke * Age, data = lungCapData) 
 modeloJunto <- lm(LungCap ~ Smoke + Age, data = lungCapData)
 summary(modeloJunto)
 
@@ -87,5 +90,3 @@ qqline(modeloJunto$residuals, lwd=2)
 plot(modeloJunto$fitted, modeloJunto$residuals, pch=16) #PASSOU
 # Rodar modelo com as duas variaveis juntas com interacao
 
-# Plot dos dois juntos
-plot(modelo1)

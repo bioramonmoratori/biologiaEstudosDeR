@@ -1,0 +1,55 @@
+Paren                   package:base                   R Documentation
+
+_P_a_r_e_n_t_h_e_s_e_s _a_n_d _B_r_a_c_e_s
+
+_D_e_s_c_r_i_p_t_i_o_n:
+
+     Open parenthesis, ‘(’, and open brace, ‘{’, are ‘.Primitive’
+     functions in R.
+
+     Effectively, ‘(’ is semantically equivalent to the identity
+     ‘function(x) x’, whereas ‘{’ is slightly more interesting, see
+     examples.
+
+_U_s_a_g_e:
+
+     ( ... )
+     
+     { ... }
+     
+_V_a_l_u_e:
+
+     For ‘(’, the result of evaluating the argument.  This has
+     visibility set, so will auto-print if used at top-level.
+
+     For ‘{’, the result of the last expression evaluated.  This has
+     the visibility of the last evaluation.
+
+_R_e_f_e_r_e_n_c_e_s:
+
+     Becker, R. A., Chambers, J. M. and Wilks, A. R. (1988) _The New S
+     Language_.  Wadsworth & Brooks/Cole.
+
+_S_e_e _A_l_s_o:
+
+     ‘if’, ‘return’, etc for other objects used in the R language
+     itself.
+
+     ‘Syntax’ for operator precedence.
+
+_E_x_a_m_p_l_e_s:
+
+     f <- get("(")
+     e <- expression(3 + 2 * 4)
+     identical(f(e), e)
+     
+     do <- get("{")
+     do(x <- 3, y <- 2*x-3, 6-x-y); x; y
+     
+     ## note the differences
+     (2+3)
+     {2+3; 4+5}
+     (invisible(2+3))
+     {invisible(2+3)}
+     
+
