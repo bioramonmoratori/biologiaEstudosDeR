@@ -37,10 +37,12 @@
 linhasTotais <- 50
 colunasTotais <- 50
 
+numeroDeGeracoes <- 60
+
 # Elementos do Mapa
-quantidadeDePresas <- 500
-quantidadeDePredadores <- 250
-quantidadeDeSubstrato <- 1000
+quantidadeDePresas <- 10
+quantidadeDePredadores <- 5
+quantidadeDeSubstrato <- 100
 
 # Parametros dos Elementos
 tempoDeVidaDaPresa <- 5
@@ -66,6 +68,8 @@ Especie <- list(
 )
 
 ##### Funcoes #####
+
+library(animation)
 
 criarMapaInicial <- function() {
 
@@ -105,31 +109,191 @@ criarMapaInicial <- function() {
 
     }
 
+    # Definindo as posições dos recursos no mapa
+    for(i in 1:quantidadeDeSubstrato){
+        posicao <- sample(1:(linhasTotais * colunasTotais), 1, replace = FALSE)
+        linha <- floor((posicao - 1) / colunasTotais) + 1
+        coluna <- (posicao - 1) %% colunasTotais + 1
+
+        mapa[[linha, coluna]] <- 1
+    }
+
     return (mapa)
 }
 
+proximaGeracao <- function(mapa){
+
+    novaGeracao <- matrix(list(), nrow = nrow(mapa), ncol = ncol(mapa))
+    novaGeracao <- mapa
+
+    # Alterando estado das presas e predadores
+    for(i in 1:nrow(mapa)){
+        for(j in 1:ncol(mapa)){
+
+            morreu = FALSE
+
+            if(!is.null(mapa[[i, j]])){
+
+                if(is.list(mapa[i, j][[1]]) && !is.null(mapa[i, j][[1]]$tipo)){
+
+                    # Regras que valem para presas OU predadores
+                    if(mapa[i,j][[1]]$tipo == 2 || mapa[i,j][[1]]$tipo == 3){
+                        
+                        # Presa e Predador morrem se o tempo restante de vida acabar
+                        if(mapa[i,j][[1]]$tempoRestanteDeVida == 0){
+                            novaGeracao[i,j] <- -1
+                            morreu = TRUE
+                        }
+
+                        novaGeracao[i,j][[1]]$tempoRestanteDeVida <- as.numeric(mapa[i, j][[1]]$tempoRestanteDeVida) - 1
+                    }
+
+                    # Regras que valem apenas para presas
+                    if(mapa[i,j][[1]]$tipo == 2 && morreu == FALSE){
+
+                        # Presa morre de fome se nao se alimentar do recurso a cada 2 geracoes
+                        if(mapa[i,j][[1]]$tempoComFome == tempoDeMorteDaPresaComFome){
+                            novaGeracao[i,j] <- -1
+                            morreu = TRUE
+                        }
+
+                        # Presa se alimenta do recurso se estiver com fome e estiver adjascente a ele
+                        if(mapa[i,j][[1]]$tempoComFome > 0 && morreu == FALSE){
+                            # Verificando se a presa esta adjascente ao recurso
+                            if(i > 1 && mapa[[i-1,j]] == 1){
+                                novaGeracao[i-1,j] <- -1
+                                novaGeracao[i,j] <- mapa[i,j][[1]]
+                                novaGeracao[i,j][[1]]$tempoComFome <- 0
+                            } else if(i < nrow(mapa) && mapa[[i+1,j]] == 1){
+                                novaGeracao[i+1,j] <- -1
+                                novaGeracao[i,j] <- mapa[i,j][[1]]
+                                novaGeracao[i,j][[1]]$tempoComFome <- 0
+                            } else if(j > 1 && mapa[[i,j-1]] == 1){
+                                novaGeracao[i,j-1] <- -1
+                                novaGeracao[i,j] <- mapa[i,j][[1]]
+                                novaGeracao[i,j][[1]]$tempoComFome <- 0
+                            } else if(j < ncol(mapa) && mapa[[i,j+1]] == 1){
+                                novaGeracao[i,j+1] <- -1
+                                novaGeracao[i,j] <- mapa[i,j][[1]]
+                                novaGeracao[i,j][[1]]$tempoComFome <- 0
+                            }
+                        }
+                    }
+
+                    # Regras que valem apenas para predadores
+                    if(mapa[i,j][[1]]$tipo == 3 && morreu == FALSE){
+                        # Predador morre de fome se nao se alimentar da presa a cada 4 geracoes
+                        if(mapa[i,j][[1]]$tempoComFome >= tempoDeMorteDoPredadorComFome){
+                            novaGeracao[[i,j]] <- -1
+                            morreu = TRUE
+                        }
+
+                        # Predador se alimenta da presa se estiver com fome e estiver adjacente a ela
+                        if(mapa[i, j][[1]]$tempoComFome > 0 && morreu == FALSE){
+                            if(i > 1 && is.list(mapa[i - 1, j]) && mapa[i - 1, j][[1]]$tipo == 2){
+                                novaGeracao[i - 1, j] <- -1
+                                novaGeracao[i, j] <- mapa[i, j][[1]]
+                                novaGeracao[i, j][[1]]$tempoComFome <- 0
+                            } else if(i < nrow(mapa) && is.list(mapa[i + 1, j]) && mapa[i + 1, j][[1]]$tipo == 2){
+                                novaGeracao[i + 1, j] <- -1
+                                novaGeracao[i, j] <- mapa[i, j][[1]]
+                                novaGeracao[i, j][[1]]$tempoComFome <- 0
+                            } else if(j > 1 && is.list(mapa[i, j - 1]) && mapa[i, j - 1][[1]]$tipo == 2){
+                                novaGeracao[i, j - 1] <- -1
+                                novaGeracao[i, j] <- mapa[i, j][[1]]
+                                novaGeracao[i, j][[1]]$tempoComFome <- 0
+                            } else if(j < ncol(mapa) && is.list(mapa[i, j + 1]) && mapa[i, j + 1][[1]]$tipo == 2){
+                                novaGeracao[i, j + 1] <- -1
+                                novaGeracao[i, j] <- mapa[i, j][[1]]
+                                novaGeracao[i, j][[1]]$tempoComFome <- 0
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    return (novaGeracao)
+}
+
+desenharMapa <- function(mapa) {
+
+    desenho <- plot(0, type = "n", xlim = c(0, ncol(mapa)), ylim = c(0, nrow(mapa)), xlab = "", ylab = "")
+    
+
+    for (i in 1:nrow(mapa)) {
+    for (j in 1:ncol(mapa)) {
+        if (!is.null(mapa[i, j]) && length(mapa[i, j]) > 0) {
+        if (is.list(mapa[i, j][[1]]) && !is.null(mapa[i, j][[1]]$tipo)) {
+            if (mapa[i, j][[1]]$tipo == 2) {
+            rect(j - 1, nrow(mapa) - i, j, nrow(mapa) - i + 1, col = "blue", border = "white")
+            }
+            if (mapa[i, j][[1]]$tipo == 3) {
+            rect(j - 1, nrow(mapa) - i, j, nrow(mapa) - i + 1, col = "red", border = "white")
+            }
+        } else if (identical(mapa[[i, j]], 1)) {
+            rect(j - 1, nrow(mapa) - i, j, nrow(mapa) - i + 1, col = "green", border = "white")
+        }
+        } else {
+        rect(j - 1, nrow(mapa) - i, j, nrow(mapa) - i + 1, col = "white", border = "white")
+        }
+    }
+    }
+
+}
+
+# Função para atualizar a animação
+atualizarAnimacao <- function(mapa, geracao) {
+  mapa <<- proximaGeracao(mapa)
+  desenharMapa(mapa)
+  
+  title(paste("Geração:", geracao), line = 3, cex.main = 1.5)
+}
+
+
+##### Executando a Simulacao #####
+
 mapa <- criarMapaInicial()
+desenharMapa(mapa)
 
-# Filtrando os predadores do mapa
-predadoresPosicaoLinha <- lapply(mapa, function(cell) {
-  if (length(cell) > 0 && !is.null(cell) && cell$tipo == 3) {
-    return(cell$posicaoLinhaNoMapa)
-  } else {
-    return(NULL)
+# Criando a animação
+ani.options(interval = 0.2)
+saveGIF({
+  for (geracao in 1:numeroDeGeracoes) {
+    atualizarAnimacao(mapa, geracao)
   }
-})
+}, movie.name = "modelo_animado.gif", ani.width = 500, ani.height = 500)
 
-predadoresPosicaoColuna <- lapply(mapa, function(cell) {
-  if (length(cell) > 0 && !is.null(cell) && cell$tipo == 3) {
-    return(cell$posicaoColunaNoMapa)
-  } else {
-    return(NULL)
-  }
-})
 
-predadoresPosicaoLinha <- unlist(predadoresPosicaoLinha)
-predadoresPosicaoColuna <- unlist(predadoresPosicaoColuna)
 
-predadoresPosicaoLinha
-predadoresPosicaoColuna
+
+
+
+
+
+# # Filtrando os predadores do mapa
+# predadoresPosicaoLinha <- lapply(mapa, function(cell) {
+#   if (length(cell) > 0 && !is.null(cell) && cell$tipo == 3) {
+#     return(cell$posicaoLinhaNoMapa)
+#   } else {
+#     return(NULL)
+#   }
+# })
+
+# predadoresPosicaoColuna <- lapply(mapa, function(cell) {
+#   if (length(cell) > 0 && !is.null(cell) && cell$tipo == 3) {
+#     return(cell$posicaoColunaNoMapa)
+#   } else {
+#     return(NULL)
+#   }
+# })
+
+
+# predadoresPosicaoLinha <- unlist(predadoresPosicaoLinha)
+# predadoresPosicaoColuna <- unlist(predadoresPosicaoColuna)
+
+# predadoresPosicaoLinha
+# predadoresPosicaoColuna
 
