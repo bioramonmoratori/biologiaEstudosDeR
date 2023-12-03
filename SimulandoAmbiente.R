@@ -18,7 +18,10 @@
 # Predador e Presa morrem se o tempo de vida terminar
 
 # A reproducao so ocorre a cada configuracao especifica de tempo
+# A reproducao pode ocorrer em cima de um substrato ou campo vazio apenas
+# A reproducao ocorre em um campo adjascente aleatorio
 
+# Apenas os predadores se locomovem
 
 ##### Legenda do Mapa #####
 
@@ -35,9 +38,9 @@ colunasTotais <- 25
 numeroDeGeracoes <- 40
 
 # Elementos do Mapa
-quantidadeDePresas <- 100
-quantidadeDePredadores <- 20
-quantidadeDeSubstrato <- 500
+quantidadeDePresas <- 150
+quantidadeDePredadores <- 50
+quantidadeDeSubstrato <- 420
 
 # Parametros dos Elementos
 tempoDeVidaDaPresa <- 4
@@ -52,9 +55,9 @@ tempoDeReproducaoDoPredador <- 7
 # Entidades
 Entidade <- list(
   tipo = 0,   
-  tempoRestanteParaMorrerDeFome = 0,        # Contador de fome
-  tempoRestanteDeVida = 0, # Tempo de vida
-  tempoParaProximaReproducao = 0   # Contador para reprodução
+  tempoRestanteParaMorrerDeFome = 0,        
+  tempoRestanteDeVida = 0, 
+  tempoParaProximaReproducao = 0   
 )
 
 ##### Funcoes #####
