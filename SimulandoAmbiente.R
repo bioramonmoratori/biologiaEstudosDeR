@@ -6,23 +6,19 @@
 # Predador -> Quadrados de cor vermelha
 # Recursos -> Quadrados de cor verde
 
-# Presa vive em media 5 geracoes
-# Predador vive em media 10 geracoes
+# Presa tem a estrategia R -> reproducao rapida e vida curta
+# Predador tem a estrategia K -> reproducao lenta e vida longa
 
-# Apenas as presas usam os recursos
-# Presa morre de fome se nao se alimentar do recurso a cada 2 geracoes
-# Presa se alimenta do recurso se estiver com fome e estiver adjascente a ele
+# Apenas as presas se alimentam do substrato
+# Apenas os predadores se alimentam das presas
+# Todos precisam se alimentar antes da reproducao
+# A alimentacao ocorre se o alimento (presa ou substrato) estiver no campo adjascente
 
-# Predador se alimenta da presa se estiver com fome e estiver adjascente a ela
-# Predador morre de fome se nao se alimentar da presa a cada 4 geracoes
-# Predador tem fome a cada 2 geracoes
+# Predador e Presa morrem de fome de acordo com suas configuracoes especificas de fome
+# Predador e Presa morrem se o tempo de vida terminar
 
+# A reproducao so ocorre a cada configuracao especifica de tempo
 
-# Presa se reproduz a cada 2 geracoes
-# Predador se reproduz a cada 5 geracoes
-
-# Presa se move a cada 1 geracao e anda 2 casas aleatoriamente
-# Predador se move a cada 1 geracao e anda 1 casa aleatoriamente
 
 ##### Legenda do Mapa #####
 
@@ -153,8 +149,8 @@ proximaGeracao <- function(mapa) {
 
     novaGeracao <- mapa
 
-    for(i in 1:linhasTotais){
-        for(j in 1:colunasTotais){
+    for(i in 1:nrow(mapa)){
+        for(j in 1:ncol(mapa)){
             novaGeracao[[i, j]][[2]][1] <- mapa[[i, j]][[2]][1]
             novaGeracao[[i, j]][[3]][1] <- mapa[[i, j]][[3]][1]
             novaGeracao[[i, j]][[4]][1] <- mapa[[i, j]][[4]][1] 
@@ -166,15 +162,15 @@ proximaGeracao <- function(mapa) {
     #### Regras de Morte ####
 
     # Morre se estiver com fome ou sem tempo de vida
-    for (i in 1:linhasTotais) {
-        for (j in 1:colunasTotais) {
+    for(i in 1:nrow(novaGeracao)){
+        for(j in 1:ncol(novaGeracao)){
             if(novaGeracao[[i, j]][[1]][1] != 0 && novaGeracao[[i, j]][[1]][1] != 1){
                 if((novaGeracao[[i, j]][[1]][1] == 2 || novaGeracao[[i, j]][[1]][1] == 3) && novaGeracao[[i, j]][[2]][1] <= 0){
                     novaGeracao[[i, j]][[1]][1] <- 0
                 } 
-                # if((novaGeracao[[i, j]][[1]][1] == 2 || novaGeracao[[i, j]][[1]][1] == 3 ) && novaGeracao[[i, j]][[3]][1] <= 0){
-                #     novaGeracao[[i, j]][[1]][1] <- 0
-                # }
+                else if((novaGeracao[[i, j]][[1]][1] == 2 || novaGeracao[[i, j]][[1]][1] == 3 ) && novaGeracao[[i, j]][[3]][1] <= 0){
+                    novaGeracao[[i, j]][[1]][1] <- 0
+                }
             }
         }
     }
@@ -182,51 +178,53 @@ proximaGeracao <- function(mapa) {
     #### Regras de Alimentacao ####
 
     #Presa come substrato ao redor caso exista
-    for(i in 1:linhasTotais){
-        for(j in 1:colunasTotais){
+    for(i in 1:nrow(novaGeracao)){
+        for(j in 1:ncol(novaGeracao)){
             if(novaGeracao[[i, j]][[1]][1] == 2){
-
-                if(i > 1 && novaGeracao[[i - 1, j]][[1]][1] == 1){
-                    novaGeracao[[i - 1, j]][[1]][1] <- 0
-                    novaGeracao[[i, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] + tempoDeMorteDaPresaComFome
-                } 
-                else if(i < (linhasTotais - 1) && novaGeracao[[i + 1, j]][[1]][1] == 1){
-                    novaGeracao[[i + 1, j]][[1]][1] <- 0 
-                    novaGeracao[[i, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] + tempoDeMorteDaPresaComFome
+                if(i > 1 && j > 1 && i < nrow(novaGeracao) && j < ncol(novaGeracao)){
+                    if(i > 2 && novaGeracao[[i - 1, j]][[1]][1] == 1){
+                        novaGeracao[[i - 1, j]][[1]][1] <- 0
+                        novaGeracao[[i, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] + tempoDeMorteDaPresaComFome
+                    } 
+                    else if(i < (linhasTotais - 1) && novaGeracao[[i + 1, j]][[1]][1] == 1){
+                        novaGeracao[[i + 1, j]][[1]][1] <- 0 
+                        novaGeracao[[i, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] + tempoDeMorteDaPresaComFome
+                    }
+                    else if(j > 1 && novaGeracao[[i, j - 1]][[1]][1] == 1){
+                        novaGeracao[[i, j - 1]][[1]][1] <- 0 
+                        novaGeracao[[i, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] + tempoDeMorteDaPresaComFome
+                    }
+                    else if(j < (colunasTotais - 1) && novaGeracao[[i, j + 1]][[1]][1] == 1){
+                        novaGeracao[[i, j + 1]][[1]][1] <- 0 
+                        novaGeracao[[i, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] + tempoDeMorteDaPresaComFome
+                    }  
                 }
-                else if(j > 1 && novaGeracao[[i, j - 1]][[1]][1] == 1){
-                    novaGeracao[[i, j - 1]][[1]][1] <- 0 
-                    novaGeracao[[i, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] + tempoDeMorteDaPresaComFome
-                }
-                else if(j < (colunasTotais - 1) && novaGeracao[[i, j + 1]][[1]][1] == 1){
-                    novaGeracao[[i, j + 1]][[1]][1] <- 0 
-                    novaGeracao[[i, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] + tempoDeMorteDaPresaComFome
-                }  
             }
         }
     }
 
     # Predador come presa ao redor caso exista e se faltar metade do tempo para morrer de fome
-    for(i in 1:linhasTotais){
-        for(j in 1:colunasTotais){
+    for(i in 1:nrow(novaGeracao)){
+        for(j in 1:ncol(novaGeracao)){
             if(novaGeracao[[i, j]][[1]][1] == 3 && novaGeracao[[i, j]][[2]][1] <= tempoDeMorteDoPredadorComFome / 2){
-
-                if(i > 1 && novaGeracao[[i - 1, j]][[1]][1] == 2){
-                    novaGeracao[[i - 1, j]][[1]][1] <- 0
-                    novaGeracao[[i, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] + tempoDeMorteDoPredadorComFome
-                } 
-                else if(i < (linhasTotais - 1) && novaGeracao[[i + 1, j]][[1]][1] == 2){
-                    novaGeracao[[i + 1, j]][[1]][1] <- 0 
-                    novaGeracao[[i, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] + tempoDeMorteDoPredadorComFome
+                if(i > 1 && j > 1 && i < nrow(novaGeracao) && j < ncol(novaGeracao)){
+                    if(i > 2 && novaGeracao[[i - 1, j]][[1]][1] == 2){
+                        novaGeracao[[i - 1, j]][[1]][1] <- 0
+                        novaGeracao[[i, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] + tempoDeMorteDoPredadorComFome
+                    } 
+                    else if(i < (linhasTotais - 1) && novaGeracao[[i + 1, j]][[1]][1] == 2){
+                        novaGeracao[[i + 1, j]][[1]][1] <- 0 
+                        novaGeracao[[i, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] + tempoDeMorteDoPredadorComFome
+                    }
+                    else if(j > 1 && novaGeracao[[i, j - 1]][[1]][1] == 2){
+                        novaGeracao[[i, j - 1]][[1]][1] <- 0 
+                        novaGeracao[[i, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] + tempoDeMorteDoPredadorComFome
+                    }
+                    else if(j < (colunasTotais - 1) && novaGeracao[[i, j + 1]][[1]][1] == 2){
+                        novaGeracao[[i, j + 1]][[1]][1] <- 0 
+                        novaGeracao[[i, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] + tempoDeMorteDoPredadorComFome
+                    }  
                 }
-                else if(j > 1 && novaGeracao[[i, j - 1]][[1]][1] == 2){
-                    novaGeracao[[i, j - 1]][[1]][1] <- 0 
-                    novaGeracao[[i, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] + tempoDeMorteDoPredadorComFome
-                }
-                else if(j < (colunasTotais - 1) && novaGeracao[[i, j + 1]][[1]][1] == 2){
-                    novaGeracao[[i, j + 1]][[1]][1] <- 0 
-                    novaGeracao[[i, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] + tempoDeMorteDoPredadorComFome
-                }  
             }
         }
     }
@@ -235,8 +233,8 @@ proximaGeracao <- function(mapa) {
 
     # Ambos se reproduzem e o contador volta ao default
 
-    for(i in 1:linhasTotais){
-        for(j in 1:colunasTotais){
+    for(i in 1:nrow(novaGeracao)){
+        for(j in 1:ncol(novaGeracao)){
 
             # PRESAS SE REPRODUZEM
             if(novaGeracao[[i, j]][[1]][1] == 2 && novaGeracao[[i, j]][[2]][1] > 0){
@@ -249,68 +247,70 @@ proximaGeracao <- function(mapa) {
                     while(numeroDeReproducoes < 2){
 
                         espacoAmostralDeLocaisParaReproduzir <- c()
+                        if(i > 1 && j > 1 && i < nrow(novaGeracao) && j < ncol(novaGeracao)){
+                            if (i > 2 && (novaGeracao[[i - 1, j]][[1]][1] == 0 || novaGeracao[[i - 1, j]][[1]][1] == 1)) {
+                                # Adiciona na lista de possíveis locais para reproduzir
+                                espacoAmostralDeLocaisParaReproduzir <- c(espacoAmostralDeLocaisParaReproduzir, 1)
+                            }
+                            if (i < (linhasTotais - 1) && (novaGeracao[[i + 1, j]][[1]][1] == 0 || novaGeracao[[i + 1, j]][[1]][1] == 1)) {
+                                # Adiciona na lista de possíveis locais para reproduzir
+                                espacoAmostralDeLocaisParaReproduzir <- c(espacoAmostralDeLocaisParaReproduzir, 2)
+                            }
+                            if (j > 2 && (novaGeracao[[i, j - 1]][[1]][1] == 0 || novaGeracao[[i, j - 1]][[1]][1] == 1)) {
+                                # Adiciona na lista de possíveis locais para reproduzir
+                                espacoAmostralDeLocaisParaReproduzir <- c(espacoAmostralDeLocaisParaReproduzir, 3)
+                            }
+                            if (j < (colunasTotais - 1) && (novaGeracao[[i, j + 1]][[1]][1] == 0 || novaGeracao[[i, j + 1]][[1]][1] == 1)) {
+                                # Adiciona na lista de possíveis locais para reproduzir
+                                espacoAmostralDeLocaisParaReproduzir <- c(espacoAmostralDeLocaisParaReproduzir, 4)
+                            }
+                            print(espacoAmostralDeLocaisParaReproduzir)
 
-                        if (i > 2 && (novaGeracao[[i - 1, j]][[1]][1] == 0 || novaGeracao[[i - 1, j]][[1]][1] == 1)) {
-                            # Adiciona na lista de possíveis locais para reproduzir
-                            espacoAmostralDeLocaisParaReproduzir <- c(espacoAmostralDeLocaisParaReproduzir, 1)
+                            # Verifica se há elementos na lista antes de chamar sample
+                            if (length(espacoAmostralDeLocaisParaReproduzir) > 0) {
+                                ondeReproduzir <- sample(espacoAmostralDeLocaisParaReproduzir, 1)
+                            } else {
+                                print("Lista vazia, nenhum elemento para amostragem.")
+                            }
+                        
+
+                            # Realizando a reproducao
+
+                            if(ondeReproduzir == 1){
+                                novaGeracao[[i - 1, j]][[1]][1] <- 2
+                                novaGeracao[[i - 1, j]][[2]][1] <- tempoDeMorteDaPresaComFome
+                                novaGeracao[[i - 1, j]][[3]][1] <- tempoDeVidaDaPresa
+                                novaGeracao[[i - 1, j]][[4]][1] <- tempoDeReproducaoDaPresa
+
+                                novaGeracao[[i, j]][[4]][1] <- tempoDeReproducaoDaPresa
+                            } 
+                            else if(ondeReproduzir == 2){
+                                novaGeracao[[i + 1, j]][[1]][1] <- 2
+                                novaGeracao[[i + 1, j]][[2]][1] <- tempoDeMorteDaPresaComFome
+                                novaGeracao[[i + 1, j]][[3]][1] <- tempoDeVidaDaPresa
+                                novaGeracao[[i + 1, j]][[4]][1] <- tempoDeReproducaoDaPresa
+
+                                novaGeracao[[i, j]][[4]][1] <- tempoDeReproducaoDaPresa
+                            }
+                            else if(ondeReproduzir == 3){
+                                novaGeracao[[i, j - 1]][[1]][1] <- 2
+                                novaGeracao[[i, j - 1]][[2]][1] <- tempoDeMorteDaPresaComFome
+                                novaGeracao[[i, j - 1]][[3]][1] <- tempoDeVidaDaPresa
+                                novaGeracao[[i, j - 1]][[4]][1] <- tempoDeReproducaoDaPresa
+
+                                novaGeracao[[i, j]][[4]][1] <- tempoDeReproducaoDaPresa
+                            }
+                            else if(ondeReproduzir == 4){
+                                novaGeracao[[i, j + 1]][[1]][1] <- 2
+                                novaGeracao[[i, j + 1]][[2]][1] <- tempoDeMorteDaPresaComFome
+                                novaGeracao[[i, j + 1]][[3]][1] <- tempoDeVidaDaPresa
+                                novaGeracao[[i, j + 1]][[4]][1] <- tempoDeReproducaoDaPresa
+
+                                novaGeracao[[i, j]][[4]][1] <- tempoDeReproducaoDaPresa
+                            } 
+
+                            numeroDeReproducoes <- numeroDeReproducoes + 1
                         }
-                        if (i < (linhasTotais - 1) && (novaGeracao[[i + 1, j]][[1]][1] == 0 || novaGeracao[[i + 1, j]][[1]][1] == 1)) {
-                            # Adiciona na lista de possíveis locais para reproduzir
-                            espacoAmostralDeLocaisParaReproduzir <- c(espacoAmostralDeLocaisParaReproduzir, 2)
-                        }
-                        if (j > 2 && (novaGeracao[[i, j - 1]][[1]][1] == 0 || novaGeracao[[i, j - 1]][[1]][1] == 1)) {
-                            # Adiciona na lista de possíveis locais para reproduzir
-                            espacoAmostralDeLocaisParaReproduzir <- c(espacoAmostralDeLocaisParaReproduzir, 3)
-                        }
-                        if (j < (colunasTotais - 1) && (novaGeracao[[i, j + 1]][[1]][1] == 0 || novaGeracao[[i, j + 1]][[1]][1] == 1)) {
-                            # Adiciona na lista de possíveis locais para reproduzir
-                            espacoAmostralDeLocaisParaReproduzir <- c(espacoAmostralDeLocaisParaReproduzir, 4)
-                        }
-                        print(espacoAmostralDeLocaisParaReproduzir)
-
-                        # Verifica se há elementos na lista antes de chamar sample
-                        if (length(espacoAmostralDeLocaisParaReproduzir) > 0) {
-                            ondeReproduzir <- sample(espacoAmostralDeLocaisParaReproduzir, 1)
-                        } else {
-                            print("Lista vazia, nenhum elemento para amostragem.")
-                        }
-
-                        # Realizando a reproducao
-
-                        if(ondeReproduzir == 1){
-                            novaGeracao[[i - 1, j]][[1]][1] <- 2
-                            novaGeracao[[i - 1, j]][[2]][1] <- tempoDeMorteDaPresaComFome
-                            novaGeracao[[i - 1, j]][[3]][1] <- tempoDeVidaDaPresa
-                            novaGeracao[[i - 1, j]][[4]][1] <- tempoDeReproducaoDaPresa
-
-                            novaGeracao[[i, j]][4] <- tempoDeReproducaoDaPresa
-                        } 
-                        else if(ondeReproduzir == 2){
-                            novaGeracao[[i + 1, j]][[1]][1] <- 2
-                            novaGeracao[[i + 1, j]][[2]][1] <- tempoDeMorteDaPresaComFome
-                            novaGeracao[[i + 1, j]][[3]][1] <- tempoDeVidaDaPresa
-                            novaGeracao[[i + 1, j]][[4]][1] <- tempoDeReproducaoDaPresa
-
-                            novaGeracao[[i, j]][4] <- tempoDeReproducaoDaPresa
-                        }
-                        else if(ondeReproduzir == 3){
-                            novaGeracao[[i, j - 1]][[1]][1] <- 2
-                            novaGeracao[[i, j - 1]][[2]][1] <- tempoDeMorteDaPresaComFome
-                            novaGeracao[[i, j - 1]][[3]][1] <- tempoDeVidaDaPresa
-                            novaGeracao[[i, j - 1]][[4]][1] <- tempoDeReproducaoDaPresa
-
-                            novaGeracao[[i, j]][4] <- tempoDeReproducaoDaPresa
-                        }
-                        else if(ondeReproduzir == 4){
-                            novaGeracao[[i, j + 1]][[1]][1] <- 2
-                            novaGeracao[[i, j + 1]][[2]][1] <- tempoDeMorteDaPresaComFome
-                            novaGeracao[[i, j + 1]][[3]][1] <- tempoDeVidaDaPresa
-                            novaGeracao[[i, j + 1]][[4]][1] <- tempoDeReproducaoDaPresa
-
-                            novaGeracao[[i, j]][4] <- tempoDeReproducaoDaPresa
-                        } 
-
-                        numeroDeReproducoes <- numeroDeReproducoes + 1
                     }
                 } 
             }
@@ -327,63 +327,68 @@ proximaGeracao <- function(mapa) {
 
                         espacoAmostralDeLocaisParaReproduzir <- c()
 
-                        if (i > 2 && (novaGeracao[[i - 1, j]][[1]][1] == 0 || novaGeracao[[i - 1, j]][[1]][1] == 1)) {
-                            # Adiciona na lista de possíveis locais para reproduzir
-                            espacoAmostralDeLocaisParaReproduzir <- c(espacoAmostralDeLocaisParaReproduzir, 1)
-                        }
-                        if (i < (linhasTotais - 1) && (novaGeracao[[i + 1, j]][[1]][1] == 0 || novaGeracao[[i + 1, j]][[1]][1] == 1)) {
-                            # Adiciona na lista de possíveis locais para reproduzir
-                            espacoAmostralDeLocaisParaReproduzir <- c(espacoAmostralDeLocaisParaReproduzir, 2)
-                        }
-                        if (j > 2 && (novaGeracao[[i, j - 1]][[1]][1] == 0 || novaGeracao[[i, j - 1]][[1]][1] == 1)) {
-                            # Adiciona na lista de possíveis locais para reproduzir
-                            espacoAmostralDeLocaisParaReproduzir <- c(espacoAmostralDeLocaisParaReproduzir, 3)
-                        }
-                        if (j < (colunasTotais - 1) && (novaGeracao[[i, j + 1]][[1]][1] == 0 || novaGeracao[[i, j + 1]][[1]][1] == 1)) {
-                        }
+                        if(i > 1 && j > 1 && i < nrow(novaGeracao) && j < ncol(novaGeracao)){
+                            if (i > 2 && (novaGeracao[[i - 1, j]][[1]][1] == 0 || novaGeracao[[i - 1, j]][[1]][1] == 1)) {
+                                # Adiciona na lista de possíveis locais para reproduzir
+                                espacoAmostralDeLocaisParaReproduzir <- c(espacoAmostralDeLocaisParaReproduzir, 1)
+                            }
+                            if (i < (linhasTotais - 1) && (novaGeracao[[i + 1, j]][[1]][1] == 0 || novaGeracao[[i + 1, j]][[1]][1] == 1)) {
+                                # Adiciona na lista de possíveis locais para reproduzir
+                                espacoAmostralDeLocaisParaReproduzir <- c(espacoAmostralDeLocaisParaReproduzir, 2)
+                            }
+                            if (j > 2 && (novaGeracao[[i, j - 1]][[1]][1] == 0 || novaGeracao[[i, j - 1]][[1]][1] == 1)) {
+                                # Adiciona na lista de possíveis locais para reproduzir
+                                espacoAmostralDeLocaisParaReproduzir <- c(espacoAmostralDeLocaisParaReproduzir, 3)
+                            }
+                            if (j < (colunasTotais - 1) && (novaGeracao[[i, j + 1]][[1]][1] == 0 || novaGeracao[[i, j + 1]][[1]][1] == 1)) {
+                                # Adiciona na lista de possíveis locais para reproduzir
+                                espacoAmostralDeLocaisParaReproduzir <- c(espacoAmostralDeLocaisParaReproduzir, 4)
+                            }
 
-                        # Verifica se há elementos na lista antes de chamar sample
-                        if (length(espacoAmostralDeLocaisParaReproduzir) > 0) {
-                            ondeReproduzir <- sample(espacoAmostralDeLocaisParaReproduzir, 1)
-                        } else {
-                            print("Lista vazia, nenhum elemento para amostragem.")
+                            # Verifica se há elementos na lista antes de chamar sample
+                            if (length(espacoAmostralDeLocaisParaReproduzir) > 0) {
+                                ondeReproduzir <- sample(espacoAmostralDeLocaisParaReproduzir, 1)
+                            } else {
+                                print("Lista vazia, nenhum elemento para amostragem.")
+                            }
+                        
+
+                            # Realizando a reproducao
+                            if(ondeReproduzir == 1){
+                                novaGeracao[[i - 1, j]][[1]][1] <- 3
+                                novaGeracao[[i - 1, j]][[2]][1] <- tempoDeMorteDoPredadorComFome
+                                novaGeracao[[i - 1, j]][[3]][1] <- tempoDeVidaDoPredador
+                                novaGeracao[[i - 1, j]][[4]][1] <- tempoDeReproducaoDoPredador
+
+                                novaGeracao[[i, j]][[4]][1] <- tempoDeReproducaoDoPredador
+                            } 
+                            else if(ondeReproduzir == 2){
+                                novaGeracao[[i + 1, j]][[1]][1] <- 3
+                                novaGeracao[[i + 1, j]][[2]][1] <- tempoDeMorteDoPredadorComFome
+                                novaGeracao[[i + 1, j]][[3]][1] <- tempoDeVidaDoPredador
+                                novaGeracao[[i + 1, j]][[4]][1] <- tempoDeReproducaoDoPredador
+
+                                novaGeracao[[i, j]][[4]][1] <- tempoDeReproducaoDoPredador
+                            }
+                            else if(ondeReproduzir == 3){
+                                novaGeracao[[i, j - 1]][[1]][1] <- 3
+                                novaGeracao[[i, j - 1]][[2]][1] <- tempoDeMorteDoPredadorComFome
+                                novaGeracao[[i, j - 1]][[3]][1] <- tempoDeVidaDoPredador
+                                novaGeracao[[i, j - 1]][[4]][1] <- tempoDeReproducaoDoPredador
+
+                                novaGeracao[[i, j]][[4]][1] <- tempoDeReproducaoDoPredador
+                            }
+                            else if(ondeReproduzir == 4){
+                                novaGeracao[[i, j + 1]][[1]][1] <- 3
+                                novaGeracao[[i, j + 1]][[2]][1] <- tempoDeMorteDoPredadorComFome
+                                novaGeracao[[i, j + 1]][[3]][1] <- tempoDeVidaDoPredador
+                                novaGeracao[[i, j + 1]][[4]][1] <- tempoDeReproducaoDoPredador
+
+                                novaGeracao[[i, j]][[4]][1] <- tempoDeReproducaoDoPredador
+                            }
+
+                            numeroDeReproducoes <- numeroDeReproducoes + 1
                         }
-
-                        # Realizando a reproducao
-                        if(ondeReproduzir == 1){
-                            novaGeracao[[i - 1, j]][[1]][1] <- 3
-                            novaGeracao[[i - 1, j]][[2]][1] <- tempoDeMorteDoPredadorComFome
-                            novaGeracao[[i - 1, j]][[3]][1] <- tempoDeVidaDoPredador
-                            novaGeracao[[i - 1, j]][[4]][1] <- tempoDeReproducaoDoPredador
-
-                            novaGeracao[[i, j]][4] <- tempoDeReproducaoDoPredador
-                        } 
-                        else if(ondeReproduzir == 2){
-                            novaGeracao[[i + 1, j]][[1]][1] <- 3
-                            novaGeracao[[i + 1, j]][[2]][1] <- tempoDeMorteDoPredadorComFome
-                            novaGeracao[[i + 1, j]][[3]][1] <- tempoDeVidaDoPredador
-                            novaGeracao[[i + 1, j]][[4]][1] <- tempoDeReproducaoDoPredador
-
-                            novaGeracao[[i, j]][4] <- tempoDeReproducaoDoPredador
-                        }
-                        else if(ondeReproduzir == 3){
-                            novaGeracao[[i, j - 1]][[1]][1] <- 3
-                            novaGeracao[[i, j - 1]][[2]][1] <- tempoDeMorteDoPredadorComFome
-                            novaGeracao[[i, j - 1]][[3]][1] <- tempoDeVidaDoPredador
-                            novaGeracao[[i, j - 1]][[4]][1] <- tempoDeReproducaoDoPredador
-
-                            novaGeracao[[i, j]][4] <- tempoDeReproducaoDoPredador
-                        }
-                        else if(ondeReproduzir == 4){
-                            novaGeracao[[i, j + 1]][[1]][1] <- 3
-                            novaGeracao[[i, j + 1]][[2]][1] <- tempoDeMorteDoPredadorComFome
-                            novaGeracao[[i, j + 1]][[3]][1] <- tempoDeVidaDoPredador
-                            novaGeracao[[i, j + 1]][[4]][1] <- tempoDeReproducaoDoPredador
-
-                            novaGeracao[[i, j]][4] <- tempoDeReproducaoDoPredador
-                        }
-
-                        numeroDeReproducoes <- numeroDeReproducoes + 1
                     }
                 }
             }
@@ -391,78 +396,79 @@ proximaGeracao <- function(mapa) {
     }
     
     #### Regras de Locomocao ####
-    for(i in 1:linhasTotais){
-        for(j in 1:colunasTotais){
+    for(i in 1:nrow(novaGeracao)){
+        for(j in 1:ncol(novaGeracao)){
 
             # PREDADORES SE LOCOMOVEM
             if(novaGeracao[[i, j]][[1]][1] == 3 && novaGeracao[[i, j]][[2]][1] > 0){
 
                 espacoAmostralDeLocaisParaLocomover <- c()
+                if(i > 1 && j > 1 && i < nrow(novaGeracao) && j < ncol(novaGeracao)){
+                    if (i > 2 && (novaGeracao[[i - 1, j]][[1]][1] == 0 || novaGeracao[[i - 1, j]][[1]][1] == 1)) {
+                        # Adiciona na lista de possíveis locais para locomover
+                        espacoAmostralDeLocaisParaLocomover <- c(espacoAmostralDeLocaisParaLocomover, 1)
+                    }
+                    if (i < (linhasTotais - 4) && (novaGeracao[[i + 1, j]][[1]][1] == 0 || novaGeracao[[i + 1, j]][[1]][1] == 1)) {
+                        # Adiciona na lista de possíveis locais para locomover
+                        espacoAmostralDeLocaisParaLocomover <- c(espacoAmostralDeLocaisParaLocomover, 2)
+                    }
+                    if (j > 2 && (novaGeracao[[i, j - 1]][[1]][1] == 0 || novaGeracao[[i, j - 1]][[1]][1] == 1)) {
+                        # Adiciona na lista de possíveis locais para locomover
+                        espacoAmostralDeLocaisParaLocomover <- c(espacoAmostralDeLocaisParaLocomover, 3)
+                    }
+                    if (j < (colunasTotais - 4) && (novaGeracao[[i, j + 1]][[1]][1] == 0 || novaGeracao[[i, j + 1]][[1]][1] == 1)) {
+                        # Adiciona na lista de possíveis locais para locomover
+                        espacoAmostralDeLocaisParaLocomover <- c(espacoAmostralDeLocaisParaLocomover, 4)
+                    }
 
-                if (i > 2 && (novaGeracao[[i - 1, j]][[1]][1] == 0 || novaGeracao[[i - 1, j]][[1]][1] == 1)) {
-                    # Adiciona na lista de possíveis locais para locomover
-                    espacoAmostralDeLocaisParaLocomover <- c(espacoAmostralDeLocaisParaLocomover, 1)
-                }
-                if (i < (linhasTotais - 1) && (novaGeracao[[i + 1, j]][[1]][1] == 0 || novaGeracao[[i + 1, j]][[1]][1] == 1)) {
-                    # Adiciona na lista de possíveis locais para locomover
-                    espacoAmostralDeLocaisParaLocomover <- c(espacoAmostralDeLocaisParaLocomover, 2)
-                }
-                if (j > 2 && (novaGeracao[[i, j - 1]][[1]][1] == 0 || novaGeracao[[i, j - 1]][[1]][1] == 1)) {
-                    # Adiciona na lista de possíveis locais para locomover
-                    espacoAmostralDeLocaisParaLocomover <- c(espacoAmostralDeLocaisParaLocomover, 3)
-                }
-                if (j < (colunasTotais - 1) && (novaGeracao[[i, j + 1]][[1]][1] == 0 || novaGeracao[[i, j + 1]][[1]][1] == 1)) {
-                    # Adiciona na lista de possíveis locais para locomover
-                    espacoAmostralDeLocaisParaLocomover <- c(espacoAmostralDeLocaisParaLocomover, 4)
-                }
+                    # Verifica se há elementos na lista antes de chamar sample
+                    if (length(espacoAmostralDeLocaisParaLocomover ) > 0) {
+                        ondeLocomover <- sample(espacoAmostralDeLocaisParaLocomover , 1)
+                    } else {
+                        print("Lista vazia, nenhum elemento para amostragem.")
+                    }
 
-                # Verifica se há elementos na lista antes de chamar sample
-                if (length(espacoAmostralDeLocaisParaLocomover ) > 0) {
-                    ondeLocomover <- sample(espacoAmostralDeLocaisParaLocomover , 1)
-                } else {
-                    print("Lista vazia, nenhum elemento para amostragem.")
-                }
+                    # Realizando a locomocao sem romper indices
+                    if(ondeLocomover == 1){ 
+                        novaGeracao[[i - 1, j]][[1]][1] <- 3
+                        novaGeracao[[i - 1, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] - 1
+                        novaGeracao[[i - 1, j]][[3]][1] <- novaGeracao[[i,j]][[3]][1] - 1
+                        novaGeracao[[i - 1, j]][[4]][1] <- novaGeracao[[i,j]][[4]][1] - 1
 
-                # Realizando a locomocao
-                if(ondeLocomover == 1){
-                    novaGeracao[[i - 1, j]][[1]][1] <- 3
-                    novaGeracao[[i - 1, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] - 1
-                    novaGeracao[[i - 1, j]][[3]][1] <- novaGeracao[[i,j]][[3]][1] - 1
-                    novaGeracao[[i - 1, j]][[4]][1] <- novaGeracao[[i,j]][[4]][1] - 1
+                        novaGeracao[[i, j]][[1]][1] <- 0
+                    } 
+                    else if(ondeLocomover == 2){
+                        novaGeracao[[i + 1, j]][[1]][1] <- 3
+                        novaGeracao[[i + 1, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] - 1
+                        novaGeracao[[i + 1, j]][[3]][1] <- novaGeracao[[i,j]][[3]][1] - 1
+                        novaGeracao[[i + 1, j]][[4]][1] <- novaGeracao[[i,j]][[4]][1] - 1
 
-                    novaGeracao[[i, j]][[1]][1] <- 0
-                } 
-                else if(ondeLocomover == 2){
-                    novaGeracao[[i + 1, j]][[1]][1] <- 3
-                    novaGeracao[[i + 1, j]][[2]][1] <- novaGeracao[[i,j]][[2]][1] - 1
-                    novaGeracao[[i + 1, j]][[3]][1] <- novaGeracao[[i,j]][[3]][1] - 1
-                    novaGeracao[[i + 1, j]][[4]][1] <- novaGeracao[[i,j]][[4]][1] - 1
+                        novaGeracao[[i, j]][[1]][1] <- 0
+                    }
+                    else if(ondeLocomover == 3){
+                        novaGeracao[[i, j - 1]][[1]][1] <- 3
+                        novaGeracao[[i, j - 1]][[2]][1] <- novaGeracao[[i,j]][[2]][1] - 1
+                        novaGeracao[[i, j - 1]][[3]][1] <- novaGeracao[[i,j]][[3]][1] - 1
+                        novaGeracao[[i, j - 1]][[4]][1] <- novaGeracao[[i,j]][[4]][1] - 1
 
-                    novaGeracao[[i, j]][[1]][1] <- 0
-                }
-                else if(ondeLocomover == 3){
-                    novaGeracao[[i, j - 1]][[1]][1] <- 3
-                    novaGeracao[[i, j - 1]][[2]][1] <- novaGeracao[[i,j]][[2]][1] - 1
-                    novaGeracao[[i, j - 1]][[3]][1] <- novaGeracao[[i,j]][[3]][1] - 1
-                    novaGeracao[[i, j - 1]][[4]][1] <- novaGeracao[[i,j]][[4]][1] - 1
+                        novaGeracao[[i, j]][[1]][1] <- 0
+                    }
+                    else if(ondeLocomover == 4){
+                        novaGeracao[[i, j + 1]][[1]][1] <- 3
+                        novaGeracao[[i, j + 1]][[2]][1] <- novaGeracao[[i,j]][[2]][1] - 1
+                        novaGeracao[[i, j + 1]][[3]][1] <- novaGeracao[[i,j]][[3]][1] - 1
+                        novaGeracao[[i, j + 1]][[4]][1] <- novaGeracao[[i,j]][[4]][1] - 1
 
-                    novaGeracao[[i, j]][[1]][1] <- 0
-                }
-                else if(ondeLocomover == 4){
-                    novaGeracao[[i, j + 1]][[1]][1] <- 3
-                    novaGeracao[[i, j + 1]][[2]][1] <- novaGeracao[[i,j]][[2]][1] - 1
-                    novaGeracao[[i, j + 1]][[3]][1] <- novaGeracao[[i,j]][[3]][1] - 1
-                    novaGeracao[[i, j + 1]][[4]][1] <- novaGeracao[[i,j]][[4]][1] - 1
-
-                    novaGeracao[[i, j]][[1]][1] <- 0
+                        novaGeracao[[i, j]][[1]][1] <- 0
+                    }
                 }
             }
         }
     }
 
     #### SE AINDA ESTA VIVO, ATUALIZA OS CONTADORES ####
-    for(i in 1:linhasTotais){
-        for(j in 1:colunasTotais){
+    for(i in 1:nrow(novaGeracao)){
+        for(j in 1:ncol(novaGeracao)){
             if(novaGeracao[[i, j]][[1]][1] == 2 || novaGeracao[[i, j]][[1]][1] == 3){
                 novaGeracao[[i, j]][[2]][1] <- novaGeracao[[i, j]][[2]][1] - 1
                 novaGeracao[[i, j]][[3]][1] <- novaGeracao[[i, j]][[3]][1] - 1
