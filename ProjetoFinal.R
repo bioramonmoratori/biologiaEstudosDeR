@@ -31,7 +31,6 @@
 # 2 -> Presa
 # 3 -> Predador
 
-1+1
 ##### Inputs #####
 
 # Area do Mapa
